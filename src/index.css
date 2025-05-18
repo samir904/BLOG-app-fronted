@@ -1,5 +1,13 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 body{
   margin: auto;
   max-width: 1440px;
