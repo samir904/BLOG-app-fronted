@@ -17,26 +17,27 @@ const initialState={
 
 }
 
-export const createAccount=createAsyncThunk("/auth/signup",async(data)=>{
-    try{
-        const res=axiosInstance.post("user/register",data)
-        toast.promise(res,{
-            loading:"Wait creating your account",
-            success:(data)=>{
-                return data?.data?.message||"Account created successfully"
-            },
-            error:"Failed to create account"
-
-        },{
-            loading:toastStyles.loading,
-            success:toastStyles.success,
-            error:toastStyles.error
-        })
-        return (await res).data;
-    }catch(e){
-        toast.error(e?.response?.data?.message,toastStyles.error)
-    }
-})
+export const createAccount = createAsyncThunk("/auth/signup", async (data, { rejectWithValue }) => {
+  try {
+    const res = axiosInstance.post("user/register", data);
+    toast.promise(res, {
+      loading: "Wait creating your account",
+      success: (data) => {
+        return data?.data?.message || "Account created successfully";
+      },
+      error: (error) => {
+        return error?.response?.data?.message || "Failed to create account";
+      },
+    }, {
+      loading: toastStyles.loading,
+      success: toastStyles.success,
+      error: toastStyles.error
+    });
+    return (await res).data;
+  } catch (e) {
+    return rejectWithValue(e?.response?.data || { message: "Failed to create account" });
+  }
+});
 
 export const login=createAsyncThunk("/auth/login",async(data)=>{
     try{
@@ -173,8 +174,8 @@ const authslice=createSlice({
     extraReducers:(builder)=>{
         builder.addCase(createAccount.fulfilled,(state,action)=>{
             localStorage.setItem("isLoggedIn",true)
-            localStorage.setItem("data",action?.payload?.user)
-            localStorage.setItem("role",action?.payload?.user?.role)
+           localStorage.setItem("data", JSON.stringify(action?.payload?.data));
+            localStorage.setItem("role", action?.payload?.data?.role || "user");
             state.isLoggedIn=true;
             state.data=action?.payload?.user;
             state.role=action?.payload?.user?.role;
@@ -182,7 +183,7 @@ const authslice=createSlice({
 
 
         builder.addCase(login.fulfilled,(state,action)=>{
-            localStorage.setItem("data",JSON.stringify(action?.payload?.user));
+            localStorage.setItem("data",JSON.stringify(action?.payload?.data));
             localStorage.setItem("isLoggedIn",true);
             localStorage.setItem("role",action?.payload?.user?.role)
             state.isLoggedIn=true;
@@ -197,9 +198,9 @@ const authslice=createSlice({
         })
         //why we are setting this when we already seted it to login time
         builder.addCase(getprofile.fulfilled,(state,action)=>{
-            localStorage.setItem("data",JSON.stringify(action?.payload?.user));
+            localStorage.setItem("data",JSON.stringify(action?.payload?.data));
             localStorage.setItem("isLoggedIn",true);
-            localStorage.setItem("role",action?.payload?.user?.role);
+            localStorage.setItem("role",action?.payload?.data?.role);
             state.isLoggedIn=true;
             state.data=action?.payload?.user;
             state.role=action?.payload?.user?.role;

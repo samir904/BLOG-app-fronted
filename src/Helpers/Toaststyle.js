@@ -10,13 +10,18 @@ const baseStyles = `
   rounded-xl p-5 text-base font-medium font-inter
   transition-all duration-300 ease-in-out
   flex items-center gap-3 max-w-sm mx-auto my-3
-  shadow-xl hover:shadow-2xl hover:scale-105
-  focus:ring-2 focus:ring-offset-2
-  toast-slide-in opacity-0 animate-[fadeIn_0.3s_ease-in_forwards]
-  bg-opacity-95 backdrop-blur-md
-  bg-gradient-to-r from-orange-600 to-orange-500
-  dark:from-orange-700 dark:to-orange-600
+  shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-1
+  focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50
+  opacity-0 animate-[fadeIn_0.3s_ease-in_forwards]
+  bg-opacity-90 backdrop-blur-lg
   text-white
+  border border-transparent
+  bg-clip-padding
+`;
+
+// Animation for toast dismissal (optional, requires Tailwind config)
+const dismissAnimation = `
+  data-[closed]:animate-[fadeOut_0.3s_ease-out_forwards]
 `;
 
 // Toast styles for each type
@@ -24,71 +29,76 @@ const toastStyles = {
   error: {
     style: twStyle(`
       ${baseStyles}
-      bg-gradient-to-r from-red-600 to-rose-600
-      dark:from-red-700 dark:to-rose-700
-      border-l-4 border-red-600
-      focus:ring-red-600
-      shadow-[0_0_10px_rgba(253,29,29,0.3)]
+      ${dismissAnimation}
+      bg-gradient-to-r from-purple-600 to-pink-600
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
+      border-l-4 border-red-500
+      focus:ring-red-500
+      shadow-[0_0_15px_rgba(239,68,68,0.4)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#E1306C", // Purple-Red
+      secondary: "#EF4444", // Red
     },
   },
   success: {
     style: twStyle(`
       ${baseStyles}
-      bg-gradient-to-r from-yellow-500 to-amber-300
-      dark:from-yellow-600 dark:to-amber-400
-      border-l-4 border-yellow-500
-      focus:ring-yellow-500
-      shadow-[0_0_10px_rgba(252,175,69,0.3)]
+      ${dismissAnimation}
+      bg-gradient-to-r from-purple-600 to-pink-600
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
+      border-l-4 border-green-500
+      focus:ring-green-500
+      shadow-[0_0_15px_rgba(34,197,94,0.4)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#FFDC80", // Light Yellow
+      secondary: "#22C55E", // Green
     },
   },
   info: {
     style: twStyle(`
       ${baseStyles}
-      bg-gradient-to-r from-blue-600 to-indigo-600
-      dark:from-blue-700 dark:to-indigo-700
-      border-l-4 border-blue-600
-      focus:ring-blue-600
-      shadow-[0_0_10px_rgba(64,93,230,0.3)]
+      ${dismissAnimation}
+      bg-gradient-to-r from-purple-600 to-pink-600
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
+      border-l-4 border-blue-500
+      focus:ring-blue-500
+      shadow-[0_0_15px_rgba(59,130,246,0.4)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#5B51D8", // Blue
+      secondary: "#3B82F6", // Blue
     },
   },
   warning: {
     style: twStyle(`
       ${baseStyles}
-      bg-gradient-to-r from-orange-500 to-amber-600
-      dark:from-orange-600 dark:to-amber-700
+      ${dismissAnimation}
+      bg-gradient-to-r from-purple-600 to-pink-600
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
       border-l-4 border-orange-500
       focus:ring-orange-500
-      shadow-[0_0_10px_rgba(247,119,55,0.3)]
+      shadow-[0_0_15px_rgba(249,115,22,0.4)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#F56040", // Dark Orange
+      secondary: "#F97316", // Orange
     },
   },
   loading: {
     style: twStyle(`
       ${baseStyles}
+      ${dismissAnimation}
       bg-gradient-to-r from-purple-600 to-pink-600
-      dark:from-purple-700 dark:to-pink-700
-      border-l-4 border-purple-600
-      focus:ring-purple-600
-      shadow-[0_0_10px_rgba(131,58,180,0.3)]
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
+      border-l-4 border-purple-500
+      focus:ring-purple-500
+      shadow-[0_0_15px_rgba(139,92,246,0.4)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#C13584", // Dark Pink
+      secondary: "#8B5CF6", // Purple
     },
   },
   compact: {
@@ -96,20 +106,20 @@ const toastStyles = {
       rounded-lg p-4 text-sm font-medium font-inter
       transition-all duration-300 ease-in-out
       flex items-center gap-2 max-w-xs mx-auto my-2
-      shadow-lg hover:shadow-xl hover:scale-105
-      focus:ring-2 focus:ring-offset-1
-      toast-slide-in opacity-0 animate-[fadeIn_0.3s_ease-in_forwards]
-      bg-opacity-90 backdrop-blur-md
-      bg-gradient-to-r from-yellow-400 to-orange-400
-      dark:from-yellow-500 dark:to-orange-500
+      shadow-md hover:shadow-lg hover:scale-105 hover:-translate-y-1
+      focus:ring-2 focus:ring-offset-1 focus:ring-opacity-50
+      opacity-0 animate-[fadeIn_0.3s_ease-in_forwards]
+      bg-opacity-90 backdrop-blur-lg
+      bg-gradient-to-r from-purple-600 to-pink-600
+      dark:bg-gradient-to-r dark:from-purple-700 dark:to-pink-700
       text-white
-      border-l-3 border-yellow-400
-      focus:ring-yellow-400
-      shadow-[0_0_8px_rgba(252,175,69,0.2)]
+      border-l-3 border-purple-500
+      focus:ring-purple-500
+      shadow-[0_0_10px_rgba(139,92,246,0.3)]
     `),
     iconTheme: {
       primary: "#fff",
-      secondary: "#F77737", // Orange
+      secondary: "#DB2777", // Pink
     },
   },
 };
