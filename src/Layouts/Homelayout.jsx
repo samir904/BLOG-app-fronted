@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { logout } from '../redux/Slices/AuthSlice';
+import toast from 'react-hot-toast';
 
 export default function Homelayout({ children }) {
   const dispatch = useDispatch();
@@ -13,6 +15,14 @@ export default function Homelayout({ children }) {
 
   const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn ?? false);
   const role = useSelector((state) => state?.auth?.role ?? '');
+
+  async function handleLogout(e){
+    e.preventDefault();
+    const res=await dispatch(logout());
+    if(res?.payload?.success){
+   navigate("/")
+    }
+  }
 
   const toggleLeftDrawer = () => {
     setIsLeftDrawerOpen(!isLeftDrawerOpen);
@@ -106,23 +116,31 @@ export default function Homelayout({ children }) {
               <CancelIcon fontSize="24px" />
             </button>
           </li>
-          <li><Link to="/settings" onClick={closeRightDrawer}>Settings</Link></li>
-          <li><Link to="/notifications" onClick={closeRightDrawer}>Notifications</Link></li>
-          {isLoggedIn ? (
-            <li>
-              <button
-                onClick={() => {
-                  dispatch({ type: 'auth/logout/pending' });
-                  closeRightDrawer();
-                  navigate('/login');
-                }}
-              >
-                Logout
+          
+         {!isLoggedIn&&(
+          <li className='  absolute  w-full ' >
+            <div className='w-[95%] flex items-center  justify-center ' >
+              <button className='focus:ring-2  focus:ring-purple-600 focus:ring-offset-2  mt-3 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg w-1/2 gap-2 px-2  py-1 absolute  ' >
+                  <Link to="/login" >Login</Link>
               </button>
-            </li>
-          ) : (
-            <li><Link to="/login" onClick={closeRightDrawer}>Login</Link></li>
-          )}
+              <button className='focus:ring-2  focus:ring-purple-600 focus:ring-offset-2  mt-34 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg w-1/2 gap-2 px-2 mt py-1 absolute ' >
+                <Link to="/signup" >Signup</Link>
+              </button>
+            </div>
+          </li>
+         )}
+         {isLoggedIn&&(
+          <li className='  absolute  w-full ' >
+            <div className='w-[95%] flex items-center  justify-center ' >
+              <button className='focus:ring-2  focus:ring-purple-600 focus:ring-offset-2  mt-3 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg w-1/2 gap-2 px-2  py-1 absolute  ' >
+                  <Link to="/profile" >Profile</Link>
+              </button>
+              <button onClick={handleLogout} className='focus:ring-2  focus:ring-purple-600 focus:ring-offset-2  mt-34 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg w-1/2 gap-2 px-2 mt py-1 absolute ' >
+                <Link >Logout</Link>
+              </button>
+            </div>
+          </li>
+         )}
         </ul>
       </div>
     </div>

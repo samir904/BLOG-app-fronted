@@ -42,6 +42,7 @@ export const createAccount = createAsyncThunk("/auth/signup", async (data, { rej
 export const login=createAsyncThunk("/auth/login",async(data)=>{
     try{
         const res=axiosInstance.post("/user/login",data)
+        
         toast.promise(res,{
             loading:"Wait authentication in process",
             success:(data)=>{
@@ -131,7 +132,7 @@ export const changepassword=createAsyncThunk("/auth/changepassword",async(data)=
 
 export const  forgotpassword=createAsyncThunk("/auth/forgotpassword",async(data)=>{
     try{
-        const res=axiosInstance.post("/reset",data);
+        const res=axiosInstance.post("/user/reset",data);
         toast.promise(res,{
             loading:"wait sending you email",
             success:'email sent successfully ',
@@ -148,7 +149,7 @@ export const  forgotpassword=createAsyncThunk("/auth/forgotpassword",async(data)
 
 export const resetpassword=createAsyncThunk("/auth/resetpassword",async(data)=>{
     try{
-        const res=axiosInstance.post(`/reset${data.resetToken}`,data)
+        const res=axiosInstance.post(`/user/reset/${data.resetToken}`, { password: data.password })
         toast.promise(res,{
             loading:"wait updating your password",
             success:(data)=>{
@@ -174,8 +175,8 @@ const authslice=createSlice({
     extraReducers:(builder)=>{
         builder.addCase(createAccount.fulfilled,(state,action)=>{
             localStorage.setItem("isLoggedIn",true)
-           localStorage.setItem("data", JSON.stringify(action?.payload?.data));
-            localStorage.setItem("role", action?.payload?.data?.role || "user");
+           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
+            localStorage.setItem("role", action?.payload?.user?.role || "user");
             state.isLoggedIn=true;
             state.data=action?.payload?.user;
             state.role=action?.payload?.user?.role;
@@ -183,7 +184,7 @@ const authslice=createSlice({
 
 
         builder.addCase(login.fulfilled,(state,action)=>{
-            localStorage.setItem("data",JSON.stringify(action?.payload?.data));
+            localStorage.setItem("data",JSON.stringify(action?.payload?.user));
             localStorage.setItem("isLoggedIn",true);
             localStorage.setItem("role",action?.payload?.user?.role)
             state.isLoggedIn=true;

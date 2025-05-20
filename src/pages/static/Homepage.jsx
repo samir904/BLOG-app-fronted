@@ -15,6 +15,7 @@ export default function Homepage() {
     { id: 7, title: 'Post 7', content: 'This is the content of the seventh post.' },
     { id: 8, title: 'Post 8', content: 'This is the content of the eighth post.' },
   ];
+        
 
   return (
     <Homelayout>
