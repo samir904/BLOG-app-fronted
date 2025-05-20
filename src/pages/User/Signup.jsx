@@ -56,7 +56,7 @@ async    function submitsignupform(e) {
             toast.error("All fields are required", toastStyles.error)
             return;
         }
-        //todo email validation
+       
         if(!isEmail(signupdata.email)){
             toast.error("Invalid email id ")
             return;
@@ -69,7 +69,7 @@ async    function submitsignupform(e) {
             toast.error("Name should be atleast 5 character",toastStyles.error)
             return;
         }
-        //todo password validation
+        
 
         const formdata = new FormData();
         formdata.append("userName", signupdata.userName)
@@ -97,7 +97,7 @@ async    function submitsignupform(e) {
                 <form
                 onSubmit={submitsignupform}
                 noValidate
-                 className='flex flex-col justify-center gap-3 rounded-lg p-4 text-white w-96 shadow-[0_0_10px_black]  ' 
+                 className='flex flex-col justify-center gap-3 rounded-lg p-4 text-white w-96 shadow-[0_0_10px_purple]  ' 
                  >
                     <h1 className='text-center text-2xl font-semibold ' >
                         Registration page
@@ -128,7 +128,7 @@ async    function submitsignupform(e) {
                          htmlFor="userName">Full Name</label>
                          <input 
                          type="text" 
-                         className='bg-transparent px-2 py-2 border '
+                         className=' rounded-sm bg-transparent px-2 py-2 border '
                          name='userName'
                          placeholder='Enter your name..'
                          required
@@ -144,7 +144,7 @@ async    function submitsignupform(e) {
                          htmlFor="email">Email</label>
                          <input 
                          type="email" 
-                         className='bg-transparent px-2 py-2 border '
+                         className='bg-transparent rounded-sm px-2 py-2 border '
                          name='email'
                          placeholder='Enter your email..'
                          required
@@ -160,7 +160,7 @@ async    function submitsignupform(e) {
                          htmlFor="password">Password</label>
                          <input 
                          type="password" 
-                         className='bg-transparent px-2 py-2 border '
+                         className='bg-transparent rounded-sm px-2 py-2 border '
                          name='password'
                          placeholder='Enter the password..'
                          required

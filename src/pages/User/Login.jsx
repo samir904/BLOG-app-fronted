@@ -52,7 +52,7 @@ export default function Login() {
             <form
             noValidate
             onSubmit={handleloginformsubmit}
-            className='flex rounded-md flex-col gap-2 shadow-[0_0_10px_black] p-4 w-96 '
+            className='flex rounded-md flex-col gap-2 shadow-[0_0_10px_purple] p-4 w-96 '
             >
                 <h1 className='font-bold text-2xl text-white text-center ' >
                     Login form

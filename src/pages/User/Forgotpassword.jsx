@@ -51,7 +51,7 @@ export default function Forgotpassword() {
             <form 
             onSubmit={handlefromsubmit}
             noValidate
-            className='flex rounded-md flex-col gap-2 p-4 shadow-[0_0_10px_black] text-white w-96 py-6  '
+            className='flex rounded-md flex-col gap-2 p-4 shadow-[0_0_10px_purple] text-white w-96 py-6  '
             >
                 <h1 className='text-center text-2xl font-bold ' >
                     Forgot password form

@@ -21,7 +21,7 @@ export default function Profile() {
   return (
     <Homelayout>
         <div className='min-h-[90vh] flex items-center justify-center ' >
-            <div className='my-10 flex flex-col gap-4 rounded-lg p-4 text-white shadow-[0_0_10px_black] w-96 ' >
+            <div className='my-10 flex flex-col gap-4 rounded-lg p-4 text-white shadow-[0_0_10px_purple] w-96 ' >
                 <img 
                 src={userdata?.avatar?.secure_url}
                  alt="profile photo"

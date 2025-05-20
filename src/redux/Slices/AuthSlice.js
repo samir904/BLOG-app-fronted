@@ -83,7 +83,7 @@ export const logout=createAsyncThunk("/auth/logout",async()=>{
         },{
             loading:toastStyles.loading,
             success:toastStyles.success,
-            error:toastStyles.success
+            error:toastStyles.error
         })
         return (await res).data
     }catch(e){
@@ -101,23 +101,24 @@ const res=axiosInstance.get("/user/getprofile")
     }
 })
 
-export const updateuserprofile=createAsyncThunk("/auth/update",async(data)=>{
-    try{
-        const res=axiosInstance.post("/user/update",data)
-        toast.promise(res,{
-            loading:"wait profile update in progress ",
-            success:(data)=>{
+export const updateuserprofile = createAsyncThunk("/auth/update", async (data, { rejectWithValue }) => {
+    try {
+        const res = axiosInstance.put("/user/update", data);
+        toast.promise(res, {
+            loading: "wait profile update in progress ",
+            success: (data) => {
                 return data?.data?.message
             },
-            error:"Failed to update your profile"
-        },{
-            loading:toastStyles.error,
-            success:toastStyles.success,
-            error:toastStyles.error
+            error: "Failed to update your profile"
+        }, {
+            loading: toastStyles.loading,
+            success: toastStyles.success,
+            error: toastStyles.error
         })
         return (await res).data
-    }catch(e){
-        toast.error(e?.response?.data?.message,toastStyles.error)
+    } catch (e) {
+        toast.error(e?.response?.data?.message, toastStyles.error);
+        return rejectWithValue(e?.response?.data || { message: "Failed to update profile" });
     }
 })
 

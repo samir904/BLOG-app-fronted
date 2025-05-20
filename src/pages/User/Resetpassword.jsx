@@ -61,7 +61,7 @@ async    function handleformsubmit(e){
             <form 
             onSubmit={handleformsubmit}
             noValidate
-            className='shadow-[0_0_10px_black] flex flex-col gap-2 p-4 rounded-md text-white w-96 py-6 '
+            className='shadow-[0_0_10px_purple] flex flex-col gap-2 p-4 rounded-md text-white w-96 py-6 '
             >
                 <h1
                  className='text-center text-2xl font-semibold '
