@@ -6,6 +6,7 @@ import Login from './pages/User/Login'
 import Forgotpassword from './pages/User/Forgotpassword'
 import Resetpassword from './pages/User/Resetpassword'
 import Profile from './pages/User/Profile'
+import Changepassword from './pages/User/Changepassword'
 function App() {
  
   return (
@@ -18,6 +19,7 @@ function App() {
          <Route path='/forgotpassword' element={<Forgotpassword/>} ></Route>
          <Route path='/reset-password/:resetToken' element={<Resetpassword/>} ></Route>
          <Route path='/profile' element={<Profile/>} ></Route>
+         <Route path='/changepassword' element={<Changepassword/>} ></Route>
         <Route path='*'  ></Route>
       </Routes>
       

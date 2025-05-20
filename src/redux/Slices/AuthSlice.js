@@ -123,7 +123,7 @@ export const updateuserprofile=createAsyncThunk("/auth/update",async(data)=>{
 
 export const changepassword=createAsyncThunk("/auth/changepassword",async(data)=>{
     try{
-        const res=axiosInstance.post("/change-password",data);
+        const res=axiosInstance.post("/user/change-password",data);
         toast.promise(res,{
             loading:"wait while we changing the password",
             success:(data)=>{
