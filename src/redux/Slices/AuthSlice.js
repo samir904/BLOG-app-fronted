@@ -2,20 +2,31 @@ import{ createAsyncThunk,createSlice } from "@reduxjs/toolkit"
 import toast from "react-hot-toast"
 import axiosInstance from "../../Helpers/axiosInstance"
 import toastStyles from "../../Helpers/Toaststyle.js"
-const initialState={
-    isLoggedIn:localStorage.getItem('isLoggedIn')||false,
-    role:localStorage.getItem("role")||"",
-   data:(() => {
-      try {
-        const data = localStorage.getItem("data");
-        return data ? JSON.parse(data) : {};
-      } catch (e) {
-        console.error("Failed to parse localStorage data:", e);
-        return {};
-      }
-    })(),
-
-}
+const initialState = (() => {
+    let isLoggedIn = localStorage.getItem('isLoggedIn') === "true";
+    let data = {};
+    let role = "";
+    try {
+        const stored = localStorage.getItem("data");
+        if (stored && stored !== "undefined") {
+            data = JSON.parse(stored);
+            role = data?.role || "";
+        }
+    } catch (e) {
+        data = {};
+        role = "";
+    }
+    // If isLoggedIn is true but no user data, force logout
+    if (isLoggedIn && (!data || Object.keys(data).length === 0)) {
+        isLoggedIn = false;
+        role = "";
+    }
+    return {
+        isLoggedIn,
+        data,
+        role,
+    };
+})();
 
 export const createAccount = createAsyncThunk("/auth/signup", async (data, { rejectWithValue }) => {
   try {
@@ -173,40 +184,49 @@ const authslice=createSlice({
     initialState,
     reducers:{},
     extraReducers:(builder)=>{
-        builder.addCase(createAccount.fulfilled,(state,action)=>{
-            localStorage.setItem("isLoggedIn",true)
-           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-            localStorage.setItem("role", action?.payload?.user?.role || "user");
-            state.isLoggedIn=true;
-            state.data=action?.payload?.user;
-            state.role=action?.payload?.user?.role;
-        })
+        builder.addCase(createAccount.fulfilled, (state, action) => {
+    const user = action?.payload?.user || action?.payload?.data || action?.payload;
+    localStorage.setItem("isLoggedIn", true);
+    localStorage.setItem("data", JSON.stringify(user));
+    localStorage.setItem("role", user?.role || "user");
+    state.isLoggedIn = true;
+    state.data = user;
+    state.role = user?.role || "user";
+});
 
+builder.addCase(login.fulfilled, (state, action) => {
+    const user = action?.payload?.user || action?.payload?.data || action?.payload;
+    localStorage.setItem("data", JSON.stringify(user));
+    localStorage.setItem("isLoggedIn", true);
+    localStorage.setItem("role", user?.role || "user");
+    state.isLoggedIn = true;
+    state.data = user;
+    state.role = user?.role || "user";
+});
 
-        builder.addCase(login.fulfilled,(state,action)=>{
-            localStorage.setItem("data",JSON.stringify(action?.payload?.user));
-            localStorage.setItem("isLoggedIn",true);
-            localStorage.setItem("role",action?.payload?.user?.role)
-            state.isLoggedIn=true;
-            state.data=action?.payload?.data;
-            state.role=action?.payload?.user?.role
-        })
-        builder.addCase(logout.fulfilled,(state)=>{
-            localStorage.clear();
-            state.data={};
-            state.isLoggedIn=false;
-            state.role=""
-        })
-        //why we are setting this when we already seted it to login time
-        builder.addCase(getprofile.fulfilled,(state,action)=>{
-            localStorage.setItem("data",JSON.stringify(action?.payload?.data));
-            localStorage.setItem("isLoggedIn",true);
-            localStorage.setItem("role",action?.payload?.data?.role);
-            state.isLoggedIn=true;
-            state.data=action?.payload?.user;
-            state.role=action?.payload?.user?.role;
-        })
-        
+builder.addCase(getprofile.fulfilled, (state, action) => {
+    const user = action?.payload?.user || action?.payload?.data || action?.payload;
+    localStorage.setItem("data", JSON.stringify(user));
+    localStorage.setItem("isLoggedIn", true);
+    localStorage.setItem("role", user?.role || "user");
+    state.isLoggedIn = true;
+    state.data = user;
+    state.role = user?.role || "user";
+});
+builder.addCase(logout.fulfilled, (state) => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("data");
+    localStorage.removeItem("role");
+    state.isLoggedIn = false;
+    state.data = {};
+    state.role = "";
+});
+builder.addCase(updateuserprofile.fulfilled, (state, action) => {
+    const user = action?.payload?.user || action?.payload?.data || action?.payload;
+    localStorage.setItem("data", JSON.stringify(user));
+    state.data = user;
+    state.role = user?.role || "user";
+});
     }
 })
 
