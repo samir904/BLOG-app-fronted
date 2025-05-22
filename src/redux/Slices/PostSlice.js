@@ -31,7 +31,7 @@ export const getAllPost=createAsyncThunk("/post/get",async()=>{
     }
 })
 
-export const createNewPost=createAsyncThunk("/post/creste",async(data)=>{
+export const createNewPost=createAsyncThunk("/post/create",async(data)=>{
     try{
         const res=axiosInstance.post("/post/create",data)
         toast.promise(res,{
@@ -163,6 +163,46 @@ export const getComments=createAsyncThunk("/post/getcomments",async(postId)=>{
         return response.data.comments
     }catch(error){
         toast.error(error?.response?.data?.message||"Failed to get comments")
+    }
+})
+
+export const updateComment=createAsyncThunk("/comment/updateComment",
+    async({commentId,content})=>{
+        try{
+            const res=axiosInstance.put(`/comment/${commentId}`,{content});
+            toast.promise(res,{
+                loading:"Updating comment...",
+                success:"Comment upadted successfully",
+                error:"Failed to update Comment",
+            },{
+                loading:toastStyles.loading,
+                success:toastStyles.success,
+                error:toastStyles.error
+            });
+            const response=await res;
+            return response.data.comment;//return the updated comment
+        }catch(error){
+            toast.error(error?.response?.data?.message||"Failed to update comment ",toastStyles.error)
+        }
+    }
+)
+
+export const deleteComment=createAsyncThunk("/comment/delete",async(commentId)=>{
+    try{
+        const res=axiosInstance.delete(`/comment${commentId}`)
+        toast.promise(res,{
+            loading:"Deleting your comment",
+            success:"Comment deleted successfully",
+            error:"Failed to delete comment"
+        },{
+            loading:toastStyles.loading,
+            success:toastStyles.success,
+            error:toastStyles.error
+        })
+        const response=await res;
+        return response.data
+    }catch(error){
+        toast.error(error?.response?.data?.message||"Failed to delete the comments",toastStyles.error)
     }
 })
 
@@ -304,13 +344,68 @@ const postSlice=createSlice({
         .addCase(getComments.rejected,(state,action)=>{
             state.loading=false;
             state.error=action.payload?.message||"Failed to fetch the comments"
-        })
         if(state.post){
             state.post.comments=[]//clear comments on error
         }
+        });
+
+        //updatecomment
+        builder
+        .addCase(updateComment.pending,(state)=>{
+            state.loading=true;
+            state.error=null
+        })
+        .addCase(updateComment.fulfilled,(state,action)=>{
+            state.loading=false;
+            if(state.post&&state.post.comments){
+                const commentIndex=state.post.comments.findIndex((c)=>c._id===action.payload._id);
+                if(commentIndex!==-1){
+                    state.post.comments[commentIndex]=action.payload;//update the comment in the current post
+                }
+            }
+            //update the comment in allpost array if the post exists
+            const postIndex=state.allPost.findIndex((p)=>p._id===action.payload.post);
+            if(postIndex !==-1&&state.allPost[postIndex].comments){
+                const commentIndex=state.allPost[postIndex].comments.findIndex((c)=>c._id===action.payload._id);
+                if(commentIndex!==-1){
+                    state.allPost[postIndex].comments[commentIndex]=action.payload;
+                }
+            }
+        })
+        .addCase(updateComment.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message||"Failed to update the comment"
+        })
+
+        //deletecomment
+
+        builder
+        .addCase(deleteComment.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(deleteComment.fulfilled,(state,action)=>{
+            state.loading=false;
+            const{commentId,postId}=action.payload;
+            //update the current post's comments
+            if(state.post&&state.post._id===postId&&state.post.comments){
+                state.post.comments=state.post.comments.filter((c)=>c._id!==commentId);
+            }
+            //update the post in allpost array
+            const postIndex=state.allPost.findIndex((p)=>p._id===postId);
+            if(postIndex!==-1&&state.allPost[postIndex].comments){
+                state.allPost[postIndex].comments=state.allPost[postIndex].comments.filter((c)=>c._id!==commentId);
+            }
+        })
+        .addCase(deleteComment.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message||"Failed to delete comments"
+        })
+        
 
     }
 })
+
 
 export default postSlice.reducer;
 
