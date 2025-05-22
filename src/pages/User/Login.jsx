@@ -64,7 +64,7 @@ export default function Login() {
                          htmlFor="email">Email</label>
                          <input 
                          type="email" 
-                         className='bg-transparent px-2 py-2 border '
+                         className='bg-transparent px-2 py-2 border rounded-sm '
                          name='email'
                          placeholder='Enter your email..'
                          required
@@ -80,7 +80,7 @@ export default function Login() {
                          htmlFor="password">Password</label>
                          <input 
                          type="password" 
-                         className='bg-transparent px-2 py-2 border '
+                         className='bg-transparent px-2 py-2 rounded-sm border '
                          name='password'
                          placeholder='Enter your password..'
                          required

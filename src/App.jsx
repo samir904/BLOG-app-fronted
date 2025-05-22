@@ -17,6 +17,7 @@ function App() {
 
         <Route path='/signup' element={<Signup/>} ></Route>
         <Route path='/login' element={<Login/>} ></Route>
+        {/*todo-authentication for these route */ }
          <Route path='/forgotpassword' element={<Forgotpassword/>} ></Route>
          <Route path='/reset-password/:resetToken' element={<Resetpassword/>} ></Route>
          <Route path='/profile' element={<Profile/>} ></Route>
