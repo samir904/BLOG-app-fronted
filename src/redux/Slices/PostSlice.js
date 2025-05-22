@@ -1,21 +1,26 @@
 import { createAsyncThunk,createSlice } from "@reduxjs/toolkit";
 
-import axiosInstance from "../../Helpers/axiosInstanc.js";
+import axiosInstance from "../../Helpers/axiosInstance.js";
 import toast from "react-hot-toast";
 import toastStyles from "../../Helpers/Toaststyle.js";
-import { error } from "console";
-import { response } from "express";
 
 const initialState={
     allPost:[],
     post:null,
-    loading:false,
-    error:null
+    loading:false,//for all post
+    likeLoading: false, // For likePost
+    error:null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalPosts: 0,
+      hasMore: false,
+    },
 }
 
-export const getAllPost=createAsyncThunk("/post/get",async()=>{
+export const getAllPost=createAsyncThunk("/post/get",async({ page = 1, limit = 10 } = {})=>{
     try{
-        const res=axiosInstance.get("/post");
+        const res=axiosInstance.get(`/post?page=${page}&limit=${limit}`);
         toast.promise(res,{
             loading:'Wait loading posts',
             success:'Posts loaded successfully',
@@ -112,15 +117,7 @@ export const updatePost=createAsyncThunk("/post/update",async(id,data)=>{
 export const likePost=createAsyncThunk("/post/likepost",async(id)=>{
     try{
         const res=axiosInstance.post(`/post/${id}/like`);
-        toast.promise(res,{
-            loading:'Toggling like...',
-            success:(data)=>data.data.message,//dynamic message from backend
-            error:"Failed to toggle like",
-        },{
-            loading:toastStyles.loading,
-            success:toastStyles.success,
-            error:toastStyles.error
-        })
+        
         const response=await res;
         return response.data
     }catch(error){
@@ -285,7 +282,7 @@ const postSlice=createSlice({
         //likepost
         builder
         .addCase(likePost.pending,(state)=>{
-            state.loading=true;
+            state.likeLoading=true;// Use separate likeLoading state
             state.error=null
         })
         .addCase(likePost.fulfilled,(state,action)=>{
