@@ -2,8 +2,9 @@ import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { likePost } from '../../redux/Slices/PostSlice';
+import { likePost, deletePost } from '../../redux/Slices/PostSlice';
 import toastStyles from '../../Helpers/Toaststyle';
+import { FiMoreVertical, FiEdit, FiTrash2, FiPlayCircle } from 'react-icons/fi';
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const PostCard = ({ post }) => {
   const [expand, setExpand] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [mediaError, setMediaError] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   console.log("PostCard post object:", post);
   console.log("PostCard post.media:", post.media);
@@ -20,6 +22,10 @@ const PostCard = ({ post }) => {
   const hasLiked = useMemo(() => {
     return isLoggedIn && post.likes.some((likeId) => likeId.toString() === data?._id);
   }, [isLoggedIn, post.likes, data]);
+
+  const isPostOwner = useMemo(() => {
+    return isLoggedIn && data?._id && post.user?._id && post.user._id.toString() === data._id.toString();
+  }, [isLoggedIn, data, post.user]);
 
   const handleLike = useCallback(
     async (e) => {
@@ -49,12 +55,34 @@ const PostCard = ({ post }) => {
     });
   }, [post._id]);
 
-  const handleNavigateToPost = useCallback((e) => {
-    // Prevent navigation if the click is on the video controls
-    if (e.target.tagName !== 'VIDEO') {
-      navigate(`/post/${post._id}`);
-    }
+  const handleNavigateToPost = useCallback(() => {
+    navigate(`/post/${post._id}`);
   }, [navigate, post._id]);
+
+  const handleEditPost = useCallback(() => {
+    navigate(`/edit-post/${post._id}`);
+    setShowSettings(false);
+  }, [navigate, post._id]);
+
+  const handleDeletePost = useCallback(async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        const response = await dispatch(deletePost(post._id));
+        if (response.payload?.success) {
+          toast.success("Post deleted successfully", toastStyles.success);
+        } else {
+          toast.error("Failed to delete post", toastStyles.error);
+        }
+      } catch (error) {
+        toast.error("Failed to delete post", toastStyles.error);
+      }
+    }
+    setShowSettings(false);
+  }, [dispatch, post._id]);
+
+  const handleVideoClick = useCallback((e) => {
+    e.stopPropagation();
+  }, []);
 
   const isVideo = useMemo(() => {
     if (post.media?.type) {
@@ -68,10 +96,14 @@ const PostCard = ({ post }) => {
     return result;
   }, [post.media]);
 
+  const hasMedia = useMemo(() => {
+    return post.media?.secure_url && !mediaError;
+  }, [post.media, mediaError]);
+
   return (
     <div className="bg-[#1e1e1e] p-3 sm:p-4 rounded-lg shadow-sm w-full max-w-[37rem] mx-auto">
-      {/* Header: Avatar, Username, Date */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-3">
+      {/* Header: Avatar, Username, Date, Settings */}
+      <div className="flex items-center gap-2 sm:gap-3 mb-3 relative">
         {post.user.avatar?.secure_url ? (
           <img
             src={post.user.avatar.secure_url}
@@ -98,49 +130,89 @@ const PostCard = ({ post }) => {
             {new Date(post.createdAt).toLocaleDateString()}
           </p>
         </div>
+        {isPostOwner && (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
+              className="text-gray-300 hover:text-purple-500"
+              aria-label="Post settings"
+            >
+              <FiMoreVertical className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            {showSettings && (
+              <div className="absolute right-0 mt-2 w-40 bg-[#2a2a2a] rounded-lg shadow-lg z-10">
+                <button
+                  onClick={handleEditPost}
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-300 hover:bg-[#3a3a3a] hover:text-white"
+                >
+                  <FiEdit className="w-4 h-4" />
+                  Edit Post
+                </button>
+                <button
+                  onClick={handleDeletePost}
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-300 hover:bg-[#3a3a3a] hover:text-red-500"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  Delete Post
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Media: Image or Video */}
       {post.media?.secure_url ? (
         mediaError ? (
-          <div className="w-full h-64 sm:h-96 lg:h-[80vh] bg-gray-600 rounded-lg mb-3 flex items-center justify-center text-gray-300">
+          <div className="w-full h-92 sm:h-64 md:h-96 lg:h-[80vh] bg-gray-600 rounded-lg mb-3 flex items-center justify-center text-gray-300">
             Failed to load media
           </div>
         ) : isVideo ? (
-          <video
-            src={post.media.secure_url}
-            controls
-            controlsList="nodownload" // Disable download option
-            autoPlay // Enable autoplay
-            muted // Required for autoplay to work in most browsers
-            loop // Optional: Make the video loop
-            className="w-full h-64 sm:h-96 lg:h-[80vh] object-cover rounded-lg mb-3 cursor-pointer"
+          <div
+            className="w-full h-92 sm:h-64 md:h-96 lg:h-[80vh] rounded-lg mb-3 cursor-pointer"
             onClick={handleNavigateToPost}
-            onError={(e) => {
-              console.error("Video failed to load:", post.media.secure_url);
-              setMediaError(true);
-              toast.error("Unsupported video format or failed to load video", toastStyles.error);
-            }}
           >
-            <source src={post.media.secure_url} type={post.media.format || "video/mp4"} />
-            Your browser does not support the video tag.
-          </video>
+            <video
+              src={post.media.secure_url}
+              controls
+              controlsList="nodownload"
+              autoPlay
+              muted
+              playsInline
+              loop
+              className="w-full h-full object-cover rounded-lg"
+              onClick={handleVideoClick}
+              onError={(e) => {
+                console.error("Video failed to load:", post.media.secure_url);
+                setMediaError(true);
+                toast.error("Unsupported video format or failed to load video", toastStyles.error);
+              }}
+            >
+              <source src={post.media.secure_url} type={post.media.format || "video/mp4"} />
+              Your browser does not support the video tag.
+            </video>
+          </div>
         ) : (
-          <img
-            src={post.media.secure_url}
-            alt={post.media.alt || "Post media"}
-            className="w-full h-64 sm:h-96 lg:h-[80vh] object-cover rounded-lg mb-3 cursor-pointer"
+          <div
+            className="w-full h-92 sm:h-64 md:h-96 lg:h-[80vh] rounded-lg mb-3 cursor-pointer"
             onClick={handleNavigateToPost}
-            onError={(e) => {
-              console.error("Image failed to load:", post.media.secure_url);
-              setMediaError(true);
-              e.target.onerror = null;
-              e.target.src = "https://via.placeholder.com/150?text=Media+Error";
-            }}
-          />
+          >
+            <img
+              src={post.media.secure_url}
+              alt={post.media.alt || "Post media"}
+              className="w-full h-full object-cover rounded-lg"
+              onError={(e) => {
+                console.error("Image failed to load:", post.media.secure_url);
+                setMediaError(true);
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/150?text=Media+Error";
+              }}
+            />
+          </div>
         )
       ) : (
-        <div className="w-full h-64 sm:h-96 lg:h-[80vh] bg-gray-600 rounded-lg mb-3 flex items-center justify-center text-gray-300">
+        <div className="w-full h-92 sm:h-64 md:h-96 lg:h-[80vh] bg-gray-600 rounded-lg mb-3 flex items-center justify-center text-gray-300">
           No media available
         </div>
       )}
@@ -244,6 +316,17 @@ const PostCard = ({ post }) => {
             </svg>
             <span className="text-xs sm:text-sm">{post.comments.length}</span>
           </button>
+          {hasMedia && (
+            <button
+              type="button"
+              onClick={handleNavigateToPost}
+              className="flex cursor-pointer items-center gap-1 text-gray-300 hover:text-purple-500"
+              aria-label="See post detail"
+            >
+              <FiPlayCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm">See Post</span>
+            </button>
+          )}
         </div>
         <button
           type="button"

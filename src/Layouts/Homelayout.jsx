@@ -75,8 +75,6 @@ export default function Homelayout({ children }) {
             </button>
           </li>
           <li><Link to="/" onClick={closeLeftDrawer}>Home</Link></li>
-          <li><Link to="/profile" onClick={closeLeftDrawer}>Profile</Link></li>
-          <li><Link to="/categories" onClick={closeLeftDrawer}>Categories</Link></li>
           {isLoggedIn && role === 'admin' && (
             <li><Link to="/admin" onClick={closeLeftDrawer}>Admin Dashboard</Link></li>
           )}

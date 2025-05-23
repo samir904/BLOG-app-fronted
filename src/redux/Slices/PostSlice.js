@@ -4,6 +4,7 @@ import axiosInstance from "../../Helpers/axiosInstance.js";
 import toast from "react-hot-toast";
 import toastStyles from "../../Helpers/Toaststyle.js";
 
+
 const initialState={
     allPost:[],
     post:null,
@@ -17,7 +18,7 @@ const initialState={
       hasMore: false,
     },
 }
-
+//done
 export const getAllPost=createAsyncThunk("/post/get",async({ page = 1, limit = 10 } = {})=>{
     try{
         const res=axiosInstance.get(`/post?page=${page}&limit=${limit}`);
@@ -36,6 +37,7 @@ export const getAllPost=createAsyncThunk("/post/get",async({ page = 1, limit = 1
     }
 })
 
+//done
 export const createNewPost=createAsyncThunk("/post/create",async(data)=>{
     try{
         const res=axiosInstance.post("/post/create",data)
@@ -54,7 +56,8 @@ export const createNewPost=createAsyncThunk("/post/create",async(data)=>{
     }
 })
 
-export const getPost=createAsyncThunk("/post/getpost",async(id)=>{
+//done
+export const getPost=createAsyncThunk("/post/getpost",async(id,{ rejectWithValue })=>{
     try{
         const res=axiosInstance.get(`/post/${id}`);
         toast.promise(res,{
@@ -71,12 +74,14 @@ export const getPost=createAsyncThunk("/post/getpost",async(id)=>{
         return resposnse.data.post;
     }catch(error){
         toast.error(error?.response?.data?.message||"failed to load post")
+        return rejectWithValue(error?.response?.data?.message || "Failed to load post");
     }
 })
 
+//done
 export const deletePost=createAsyncThunk("/post/delete",async(id)=>{
     try{
-        const res=axiosInstance.delete(`/post${id}`)
+        const res=axiosInstance.delete(`/post/${id}`)
         toast.promise(res,{
             loading:"Deleting your post...",
             success:"POst deleted successfully",
@@ -92,28 +97,37 @@ export const deletePost=createAsyncThunk("/post/delete",async(id)=>{
     }
 })
 
-export const updatePost=createAsyncThunk("/post/update",async(id,data)=>{
-    try{
-        const res=axiosInstance.put(`/post/${id}`,data,{
-            headers:{"content-type":"multipart/form-data"},
-        });
-        toast.promise(res,{
-            loading:"Updating post...",
-            success:"Post updated successfully",
-            error:"Failed to update post"
-        },{
-            loading:toastStyles.loading,
-            success:toastStyles.success,
-            error:toastStyles.error
-        })
-        const resposnse=await res;
-        return resposnse.data.post;
-    }catch(error){
-        toast.error(error?.response?.data?.message||"failed to update the course")
+
+//done
+export const updatePost = createAsyncThunk("/post/update", async ({ id, formData }, { rejectWithValue }) => {
+  try {
+    const res = axiosInstance.put(`/post/${id}`, formData, {
+      headers: { "content-type": "multipart/form-data" },
+    });
+
+    toast.promise(res, {
+      loading: "Updating post...",
+      success: "Post updated successfully",
+      error: "Failed to update post",
+    }, {
+      loading: toastStyles.loading,
+      success: toastStyles.success,
+      error: toastStyles.error,
+    });
+
+    const response = await res;
+    if (!response.data?.success) {
+      return rejectWithValue(response.data.message || "Failed to update post");
     }
-})
+    return response.data;
+  } catch (error) {
+    const errorMessage = error?.response?.data?.message || "Failed to update the post";
+    toast.error(errorMessage, toastStyles.error);
+    return rejectWithValue(errorMessage);
+  }
+});
 
-
+//done
 export const likePost=createAsyncThunk("/post/likepost",async(id)=>{
     try{
         const res=axiosInstance.post(`/post/${id}/like`);
@@ -125,7 +139,8 @@ export const likePost=createAsyncThunk("/post/likepost",async(id)=>{
     }
 })
 
-export const createComment=createAsyncThunk("/post/createCOmment",async({postId,content})=>{
+//done
+export const createComment=createAsyncThunk("/post/createCOmment",async({postId,content}, { rejectWithValue })=>{
     try{
         const res=axiosInstance.post(`/post/${postId}/comment`,{content})
         toast.promise(res,{
@@ -137,13 +152,14 @@ export const createComment=createAsyncThunk("/post/createCOmment",async({postId,
             success:toastStyles.success,
             error:toastStyles.error
         })
-        const reponse=await res;
+        const response=await res;
         return response.data.comment;
     }catch(error){
         toast.error(error?.response?.data?.message||"Failed to create comment",toastStyles.error)
     }
 })
 
+//done-no need 
 export const getComments=createAsyncThunk("/post/getcomments",async(postId)=>{
     try{
         const res=axiosInstance.get(`/post/${postId}/comments`)
@@ -163,6 +179,7 @@ export const getComments=createAsyncThunk("/post/getcomments",async(postId)=>{
     }
 })
 
+//done
 export const updateComment=createAsyncThunk("/comment/updateComment",
     async({commentId,content})=>{
         try{
@@ -184,24 +201,19 @@ export const updateComment=createAsyncThunk("/comment/updateComment",
     }
 )
 
-export const deleteComment=createAsyncThunk("/comment/delete",async(commentId)=>{
-    try{
-        const res=axiosInstance.delete(`/comment${commentId}`)
-        toast.promise(res,{
-            loading:"Deleting your comment",
-            success:"Comment deleted successfully",
-            error:"Failed to delete comment"
-        },{
-            loading:toastStyles.loading,
-            success:toastStyles.success,
-            error:toastStyles.error
-        })
-        const response=await res;
-        return response.data
-    }catch(error){
-        toast.error(error?.response?.data?.message||"Failed to delete the comments",toastStyles.error)
+
+// done 
+export const deleteComment = createAsyncThunk("/comment/delete", async ({ postId, commentId }, { rejectWithValue }) => {
+    try {
+        const res = axiosInstance.delete(`/comment/${commentId}`);
+        
+        const response = await res;
+        return { commentId, postId }; // Explicitly return commentId and postId
+    } catch (error) {
+        toast.error(error?.response?.data?.message || "Failed to delete the comment", toastStyles.error);
+        return rejectWithValue(error?.response?.data?.message || "Failed to delete the comment");
     }
-})
+});
 
 const postSlice=createSlice({
     name:'post',
@@ -260,24 +272,20 @@ const postSlice=createSlice({
             state.post=null
         });
 
-        //updatepost
-        builder
-        .addCase(updatePost.pending,(state)=>{
-            state.loading=true;
-            state.error=null
-        })
-        .addCase(updatePost.fulfilled,(state,action)=>{
-            state.loading=false;
-            state.post=action.payload;
-            const index=state.allPost.findIndex((p)=>p._id===action.payload._id);
-            if(index!==-1){
-                state.allPost[index]=action.payload
-            }
-        })
-        .addCase(updatePost.rejected,(state,action)=>{
-            state.loading=false;
-            state.error=action.payload?.message||"Failed to update the post"
-        });
+            // updatePost
+    builder
+      .addCase(updatePost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePost.fulfilled, (state, action) => {
+        state.loading = false;
+        state.post = action.payload; // Update the post in state
+      })
+      .addCase(updatePost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
 
         //likepost
         builder
@@ -287,6 +295,7 @@ const postSlice=createSlice({
         })
         .addCase(likePost.fulfilled,(state,action)=>{
             state.loading=false;
+            state.likeLoading=false
             state.post=action.payload.post;
             const index=state.allPost.findIndex((p)=>p._id===action.payload.post._id);
             if(index!==-1){
@@ -295,6 +304,7 @@ const postSlice=createSlice({
         })
         .addCase(likePost.rejected,(state,action)=>{
             state.loading=false;
+            state.likeLoading=false
             state.error=action.payload?.message||"Failed to toggle like button"
         });
 

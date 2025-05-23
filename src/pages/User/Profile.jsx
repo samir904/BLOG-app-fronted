@@ -55,17 +55,10 @@ export default function Profile() {
                  </div>
                  <div className='flex items-center justify-between gap-2 ' >
                     <Link 
-                    to="/createpost"
-                    className='w-1/2 focus:ring-2  text-center focus:ring-purple-600 focus:ring-offset-2  mt-3 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg '
+                    to="/post/create"
+                    className='w-full focus:ring-2  text-center focus:ring-purple-600 focus:ring-offset-2  mt-3 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg '
                     >
                         Create post
-                    </Link>
-
-                    <Link 
-                    to="/seepost"
-                    className='focus:ring-2  text-center focus:ring-purple-600 focus:ring-offset-2  mt-3 hover:from-purple-700 cursor-pointer hover:to-pink-700 bg-gradient-to-r from-purple-600 to-pink-600 transition-all ease-in-out rounded-sm duration-300 py-2 font-semibold text-lg w-1/2'
-                    >
-                        See post
                     </Link>
                  </div>
                  

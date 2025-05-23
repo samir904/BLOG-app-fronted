@@ -4,6 +4,13 @@ import { Link } from 'react-router-dom';
 import PostCard from './Postcard.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllPost } from '../../redux/Slices/PostSlice.js';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+import UploadIcon from '@mui/icons-material/Upload';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 export default function Homepage() {
   const dispatch = useDispatch();
@@ -12,6 +19,19 @@ export default function Homepage() {
   useEffect(() => {
     dispatch(getAllPost());
   }, [dispatch]);
+
+  const actions = [
+    {
+      name: 'Upload Post',
+      onClick: () => window.location.href = '/post/create',
+    },
+  ];
+
+  const theme = createTheme({
+    palette: {
+      mode: 'dark', // Match the app's dark theme
+    },
+  });
 
   const SkeletonCard = () => (
     <div className="bg-[#1e1e1e] p-4 rounded-lg shadow-sm w-full animate-pulse">
@@ -38,17 +58,58 @@ export default function Homepage() {
     </div>
   );
 
+  // Common SpeedDial component to avoid repetition
+  const renderSpeedDial = () => (
+    <ThemeProvider theme={theme}>
+      <SpeedDial
+        ariaLabel="SpeedDial for creating post"
+        className="lg:hidden"
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+          zIndex: 50,
+          '& .MuiSpeedDial-fab': {
+            background: 'linear-gradient(to right, #7C3AED, #EC4899)',
+            '&:hover': {
+              background: 'linear-gradient(to right, #6D28D9, #DB2777)',
+            },
+            '&:focus': {
+              boxShadow: '0 0 0 4px #7C3AED, 0 0 0 6px rgba(255, 255, 255, 0.1)',
+            },
+          },
+        }}
+        icon={<SpeedDialIcon />}
+      >
+        {actions.map((action) => (
+          <SpeedDialAction
+            key={action.name}
+            icon={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <UploadIcon />
+                <Typography variant="body2" sx={{ color: 'white' }}>
+                  {action.name}
+                </Typography>
+              </Box>
+            }
+            onClick={action.onClick}
+          />
+        ))}
+      </SpeedDial>
+    </ThemeProvider>
+  );
+
   if (loading) {
     return (
       <Homelayout>
         <div className="pt-6 px-4 lg:px-6 flex flex-col gap-6 bg-[#121212] min-h-[calc(100vh-64px)]">
           <div className="flex justify-between items-center mb-5">
-            <h1 className="text-center lg:text-left text-3xl font-semibold text-white">
-              All the posts are here
+            <h1 className="text-center lg:text-left text-3xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+              SnipStory
             </h1>
             <Link
               to="/post/create"
-              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 mt-3 cursor-pointer"
             >
               Create Post
             </Link>
@@ -59,6 +120,7 @@ export default function Homepage() {
             ))}
           </div>
         </div>
+        {renderSpeedDial()}
       </Homelayout>
     );
   }
@@ -68,12 +130,12 @@ export default function Homepage() {
       <Homelayout>
         <div className="pt-6 px-4 lg:px-6 flex flex-col gap-6 bg-[#121212] min-h-[calc(100vh-64px)]">
           <div className="flex justify-between items-center mb-5">
-            <h1 className="text-center lg:text-left text-3xl font-semibold text-white">
-              All the posts are here
+            <h1 className="text-center lg:text-left text-3xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+              SnipStory
             </h1>
             <Link
               to="/post/create"
-              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 mt-3 cursor-pointer"
             >
               Create Post
             </Link>
@@ -82,12 +144,13 @@ export default function Homepage() {
             <p className="text-red-500">{error}</p>
             <button
               onClick={() => dispatch(getAllPost())}
-              className="mt-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+              className="mt-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 cursor-pointer"
             >
               Retry
             </button>
           </div>
         </div>
+        {renderSpeedDial()}
       </Homelayout>
     );
   }
@@ -97,12 +160,12 @@ export default function Homepage() {
       <Homelayout>
         <div className="pt-6 px-4 lg:px-6 flex flex-col gap-6 bg-[#121212] min-h-[calc(100vh-64px)]">
           <div className="flex justify-between items-center mb-5">
-            <h1 className="text-center lg:text-left text-3xl font-semibold text-white">
-              All the posts are here
+            <h1 className="text-center lg:text-left text-3xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+              SnipStory
             </h1>
             <Link
               to="/post/create"
-              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+              className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 mt-3 cursor-pointer"
             >
               Create Post
             </Link>
@@ -111,6 +174,7 @@ export default function Homepage() {
             No posts available. Be the first to create one!
           </p>
         </div>
+        {renderSpeedDial()}
       </Homelayout>
     );
   }
@@ -119,12 +183,12 @@ export default function Homepage() {
     <Homelayout>
       <div className="pt-6 px-4 lg:px-6 flex flex-col gap-6 bg-[#121212] min-h-[calc(100vh-64px)]">
         <div className="flex justify-between items-center mb-5">
-          <h1 className="text-center lg:text-left text-3xl font-semibold text-white">
-            All the posts are here
+          <h1 className="text-center lg:text-left text-3xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+            SnipStory
           </h1>
           <Link
             to="/post/create"
-            className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+            className="hidden lg:block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-2 px-4 rounded-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 mt-3 cursor-pointer"
           >
             Create Post
           </Link>
@@ -135,6 +199,7 @@ export default function Homepage() {
           ))}
         </div>
       </div>
+      {renderSpeedDial()}
     </Homelayout>
   );
 }
