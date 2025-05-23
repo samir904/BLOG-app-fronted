@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Homelayout from '../../Layouts/Homelayout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
 import PostCard from './Postcard.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllPost } from '../../redux/Slices/PostSlice.js';
@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 
 export default function Homepage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize useNavigate
   const { allPost, loading, error } = useSelector((state) => state.post);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function Homepage() {
   const actions = [
     {
       name: 'Upload Post',
-      onClick: () => window.location.href = '/post/create',
+      onClick: () => navigate('/post/create'), // Updated to use navigate
     },
   ];
 
@@ -93,6 +94,14 @@ export default function Homepage() {
               </Box>
             }
             onClick={action.onClick}
+            sx={{
+              '& .MuiSpeedDialAction-staticTooltipLabel': {
+                background: 'linear-gradient(to right, #7C3AED, #EC4899)', // Match SpeedDial gradient
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '4px',
+              },
+            }}
           />
         ))}
       </SpeedDial>
